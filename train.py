@@ -1,13 +1,21 @@
+import pandas as pd
+import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 import joblib
 
-# Load Iris dataset
+# Load original Iris dataset (150 records)
 iris = load_iris()
-X = iris.data
+X_original = iris.data
 
-# Train K-Means
+# Load new data from CSV (your added records)
+new_data = pd.read_csv("new_data.csv").values
+
+# Combine old + new data
+X = np.vstack((X_original, new_data))
+
+# Train K-Means model
 model = KMeans(
     n_clusters=3,
     random_state=42,
@@ -19,8 +27,9 @@ model.fit(X)
 # Evaluation
 score = silhouette_score(X, model.labels_)
 
+print("Total Records Used:", len(X))
 print("Clusters:", model.n_clusters)
 print("Silhouette Score:", score)
 
-# Save model
+# Save updated model
 joblib.dump(model, "iris_kmeans.pkl")
